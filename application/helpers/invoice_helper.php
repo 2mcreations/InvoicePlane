@@ -42,9 +42,9 @@ function invoice_logo_pdf()
             return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';    // Supporto anteprima PDF
         else
         //---it---fine
-        	return '<img src="file://' . getcwd() . '/uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';
-    }
-    
+		return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';
+   }
+
     return '';
 }
 
