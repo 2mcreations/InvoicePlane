@@ -38,14 +38,8 @@ function invoice_logo_pdf()
     if ($CI->mdl_settings->setting('invoice_logo')) {
         //---it---inizio
         global $pdf_preview;
-        if(@$pdf_preview)
-            return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';    // Supporto anteprima PDF
-        else
+        return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';    // Supporto anteprima PDF
         //---it---fine
-        	return '<img src="file://' . getcwd() . '/uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';
-    }
-    
-    return '';
 }
 
 
