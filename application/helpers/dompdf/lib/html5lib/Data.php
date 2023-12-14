@@ -56,8 +56,16 @@ class HTML5_Data
      * reference.
      */
     public static function getRealCodepoint($ref) {
+<<<<<<< HEAD
         if (!isset(self::$realCodepointTable[$ref])) return false;
         else return self::$realCodepointTable[$ref];
+=======
+        if (!isset(self::$realCodepointTable[$ref])) {
+            return false;
+        } else {
+            return self::$realCodepointTable[$ref];
+        }
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
     }
 
     public static function getNamedCharacterReferences() {
@@ -82,7 +90,11 @@ class HTML5_Data
             return "\xEF\xBF\xBD";
           }*/
 
+<<<<<<< HEAD
         $x = $y = $z = $w = 0;
+=======
+        $y = $z = $w = 0;
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
         if ($code < 0x80) {
             // regular ASCII character
             $x = $code;
@@ -93,7 +105,11 @@ class HTML5_Data
                $y = (($code & 0x7FF) >> 6) | 0xC0;
             } else {
                 $y = (($code & 0xFC0) >> 6) | 0x80;
+<<<<<<< HEAD
                 if($code < 0x10000) {
+=======
+                if ($code < 0x10000) {
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
                     $z = (($code >> 12) & 0x0F) | 0xE0;
                 } else {
                     $z = (($code >> 12) & 0x3F) | 0x80;
@@ -103,9 +119,21 @@ class HTML5_Data
         }
         // set up the actual character
         $ret = '';
+<<<<<<< HEAD
         if($w) $ret .= chr($w);
         if($z) $ret .= chr($z);
         if($y) $ret .= chr($y);
+=======
+        if ($w) {
+            $ret .= chr($w);
+        }
+        if ($z) {
+            $ret .= chr($z);
+        }
+        if ($y) {
+            $ret .= chr($y);
+        }
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
         $ret .= chr($x);
 
         return $ret;
