@@ -520,7 +520,6 @@ class Mdl_Invoices extends Response_Model
         if (!empty($invoice)) {
             if ($invoice->invoice_status_id == 2) {
                 $this->db->where('invoice_id', $invoice_id);
-                $this->db->where('invoice_id', $invoice_id);
                 $this->db->set('invoice_status_id', 3);
                 $this->db->update('ip_invoices');
             }
