@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 TITLE='InvoicePlane Blue'
 DESCRIPTION='A more colorful InvoicePlane theme.'
 AUTHOR='InvoicePlane Developers & Contributors'
 AUTHOR_WEBSITE='https://invoiceplane.com/'
 LICENSE='MIT'
+=======
+TITLE='InvoicePlane Blue'
+DESCRIPTION='A more colorful InvoicePlane theme.'
+AUTHOR='InvoicePlane Developers & Contributors'
+AUTHOR_WEBSITE='https://invoiceplane.com/'
+LICENSE='MIT'
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62

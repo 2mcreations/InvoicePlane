@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
   font-family: sans-serif;
 }
@@ -23,3 +24,30 @@ td {
   text-align: center;
   font-weight: bold;
 }
+=======
+body {
+  font-family: sans-serif;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  border-bottom: #000 thin dotted;
+}
+
+td {
+  border-bottom: #000 thin dotted;
+}
+
+.amount {
+  text-align: right;
+}
+
+.report_title {
+  text-align: center;
+  font-weight: bold;
+}
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62

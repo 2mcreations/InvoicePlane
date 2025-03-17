@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 |   =========================================================
 |   Custom styles
@@ -17,3 +18,24 @@ body *:focus {
 .form-control, .panel {
   box-shadow: none;
 }
+=======
+/*
+|   =========================================================
+|   Custom styles
+|   =========================================================
+*/
+
+a:hover, a:active, a:focus {
+  outline: 0;
+  text-decoration: none;
+}
+
+body *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.form-control, .panel {
+  box-shadow: none;
+}
+>>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
