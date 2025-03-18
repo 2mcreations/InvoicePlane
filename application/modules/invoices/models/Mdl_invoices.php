@@ -286,7 +286,7 @@ class Mdl_Invoices extends Response_Model
                 'item_task_id' => $invoice_item->item_task_id,
                 'item_name' => $invoice_item->item_name,
                 'item_description' => $invoice_item->item_description,
-                'item_quantity' => $invoice_item->item_quantity * -1,
+                'item_quantity' => $invoice_item->item_quantity,
                 'item_price' => $invoice_item->item_price,
                 'item_discount_amount' => $invoice_item->item_discount_amount,
                 'item_discount_percent' => $invoice_item->item_discount_percent,

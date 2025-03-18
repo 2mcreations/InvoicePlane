@@ -165,12 +165,19 @@ class FatturaPA {
 				'causale' => 'FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale',
 		);
 		$this->_fill_node($map, $data);
+
+		// Verifica se nei dati in ingresso è presente un tipo documento specifico
+		$tipoDocumento = isset($data['tipodoc']) ? $data['tipodoc'] : 'TD01';
+
+		// Imposta TD04 se è una nota di credito
+		if (!empty($data['credit_invoice']) && $data['credit_invoice'] === true) {
+			$tipoDocumento = 'TD04';
+		}
 		
 		// imposta default
 		$this->_set_defaults([
-				// tipodoc - default: TD01 = Fattura
 				'FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento' =>
-					'TD01',
+					$tipoDocumento,
 				// valuta - default: EUR
 				'FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa' =>
 					'EUR',

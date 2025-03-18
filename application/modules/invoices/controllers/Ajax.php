@@ -433,8 +433,12 @@ class Ajax extends Admin_Controller
             $this->mdl_invoices->where('invoice_id', $target_id);
             $this->mdl_invoices->update('ip_invoices', ['creditinvoice_parent_id' => $source_id]);
 
-            $this->mdl_invoices->where('invoice_id', $target_id);
-            $this->mdl_invoices->update('ip_invoice_amounts', ['invoice_sign' => '-1']);
+            //$this->mdl_invoices->where('invoice_id', $target_id);
+            //$this->mdl_invoices->update('ip_invoice_amounts', ['invoice_sign' => '-1']);
+
+            //TODO: modify new invoice date to date now
+            //TODO: add notes to variables
+            //TODO: Modify invoce to credit invoice
 
             $response = [
                 'success' => 1,
