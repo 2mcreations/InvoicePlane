@@ -393,7 +393,8 @@ class Invoices extends Admin_Controller
     				// Descrizione prodotto/servizio
     				'descrizione' => $description,
     				// Prezzo unitario del prodotto/servizio
-    				'prezzo' => FatturaPA::dec($item->item_price),
+                    //TODO: verifica se prezzo è scontato (sconti non riportati in xml)
+    				'prezzo' => FatturaPA::dec($item->item_total),
     				// Quantità
     				'qta' => FatturaPA::dec($item->item_quantity),
     				// Prezzo totale (prezzo x qta)
