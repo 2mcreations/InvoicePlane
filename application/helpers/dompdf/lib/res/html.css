@@ -1,21 +1,5 @@
 /**
  * dompdf default stylesheet.
-<<<<<<< HEAD
- * 
- * The Original Code is mozilla.org code.
- *
- * The Initial Developer of the Original Code is Netscape Communications Corporation.
- * Portions created by the Initial Developer are Copyright (C) 1998 the Initial Developer. 
- * All Rights Reserved.
- * 
- * @package dompdf
- * @link    http://www.dompdf.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
- * @author  Blake Ross <BlakeR1234@aol.com>
- * @author  Fabien Ménager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- * @version $Id: html.css 456 2012-01-21 11:20:37Z fabien.menager $
-=======
  *
  * @package dompdf
  * @link    http://dompdf.github.com/
@@ -31,28 +15,19 @@
  * Portions from W3C
  * @link https://drafts.csswg.org/css-ui-3/#default-style-sheet
  *
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
  */
 
 @page {
   margin: 1.2cm;
 }
 
-<<<<<<< HEAD
-html { 
-  display: -dompdf-page;
-=======
 html {
   display: -dompdf-page !important;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   counter-reset: page;
 }
 
 /* blocks */
 
-<<<<<<< HEAD
-div, map, dt, isindex {
-=======
 article,
 aside,
 details,
@@ -68,7 +43,6 @@ nav,
 noscript,
 section,
 summary {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   display: block;
 }
 
@@ -88,11 +62,7 @@ dd {
   margin-left: 40px;
 }
 
-<<<<<<< HEAD
-blockquote {
-=======
 blockquote, figure {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   display: block;
   margin: 1em 40px;
 }
@@ -109,11 +79,7 @@ center {
 
 blockquote[type=cite] {
   display: block;
-<<<<<<< HEAD
-  margin: 1em 0px;
-=======
   margin: 1em 0;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   padding-left: 1em;
   border-left: solid;
   border-color: blue;
@@ -162,36 +128,18 @@ listing {
   margin: 1em 0;
 }
 
-<<<<<<< HEAD
-plaintext, xmp, pre {
-=======
 plaintext, pre, xmp {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   display: block;
   font-family: fixed;
   white-space: pre;
   margin: 1em 0;
 }
 
-<<<<<<< HEAD
-article, aside, details,
-figcaption, figure,
-footer, header, hgroup,
-nav, section {
-  display: block;
-}
-
-=======
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 /* tables */
 
 table {
   display: table;
-<<<<<<< HEAD
-  border-spacing: 2px; 
-=======
   border-spacing: 2px;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   border-collapse: separate;
   margin-top: 0;
   margin-bottom: 0;
@@ -215,17 +163,10 @@ table[border] th {
 td, th, tr {
   background: inherit;
 }
-<<<<<<< HEAD
-   
-/* caption inherits from table not table-outer */  
-caption {
-  display: block;
-=======
 
 /* caption inherits from table not table-outer */
 caption {
   display: table-caption;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   text-align: center;
 }
 
@@ -262,17 +203,10 @@ table > tr {
   vertical-align: middle;
 }
 
-<<<<<<< HEAD
-td { 
-  display: table-cell;
-  vertical-align: inherit;
-  text-align: inherit; 
-=======
 td {
   display: table-cell;
   vertical-align: inherit;
   text-align: inherit;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   padding: 1px;
 }
 
@@ -281,10 +215,6 @@ th {
   vertical-align: inherit;
   font-weight: bold;
   padding: 1px;
-<<<<<<< HEAD
-  text-align: center;
-=======
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 }
 
 /* inlines */
@@ -325,13 +255,6 @@ s, strike, del {
   text-decoration: line-through;
 }
 
-<<<<<<< HEAD
-blink {
-  text-decoration: blink;
-}
-
-=======
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 big {
   font-size: larger;
 }
@@ -356,8 +279,6 @@ nobr {
   white-space: nowrap;
 }
 
-<<<<<<< HEAD
-=======
 mark {
   background: yellow;
   color: black;
@@ -369,7 +290,6 @@ abbr[title], acronym[title] {
   text-decoration: dotted underline;
 }
 
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 /* lists */
 
 ul, menu, dir {
@@ -397,77 +317,31 @@ li {
 }*/
 
 /* nested lists have no top/bottom margins */
-<<<<<<< HEAD
-ul ul,   ul ol,   ul dir,   ul menu,   ul dl,
-ol ul,   ol ol,   ol dir,   ol menu,   ol dl,
-dir ul,  dir ol,  dir dir,  dir menu,  dir dl,
-menu ul, menu ol, menu dir, menu menu, menu dl,
-dl ul,   dl ol,   dl dir,   dl menu,   dl dl {
-=======
 :matches(ul, ol, dir, menu, dl) ul,
 :matches(ul, ol, dir, menu, dl) ol,
 :matches(ul, ol, dir, menu, dl) dir,
 :matches(ul, ol, dir, menu, dl) menu,
 :matches(ul, ol, dir, menu, dl) dl {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   margin-top: 0;
   margin-bottom: 0;
 }
 
 /* 2 deep unordered lists use a circle */
-<<<<<<< HEAD
-ol ul,   ul ul,   menu ul,   dir ul,
-ol menu, ul menu, menu menu, dir menu,
-ol dir,  ul dir,  menu dir,  dir dir {
-=======
 :matches(ul, ol, dir, menu) ul,
 :matches(ul, ol, dir, menu) ul,
 :matches(ul, ol, dir, menu) ul,
 :matches(ul, ol, dir, menu) ul {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   list-style-type: circle;
 }
 
 /* 3 deep (or more) unordered lists use a square */
-<<<<<<< HEAD
-ol ol ul,     ol ul ul,     ol menu ul,     ol dir ul,
-ol ol menu,   ol ul menu,   ol menu menu,   ol dir menu,
-ol ol dir,    ol ul dir,    ol menu dir,    ol dir dir,
-ul ol ul,     ul ul ul,     ul menu ul,     ul dir ul,
-ul ol menu,   ul ul menu,   ul menu menu,   ul dir menu,
-ul ol dir,    ul ul dir,    ul menu dir,    ul dir dir,
-menu ol ul,   menu ul ul,   menu menu ul,   menu dir ul,
-menu ol menu, menu ul menu, menu menu menu, menu dir menu,
-menu ol dir,  menu ul dir,  menu menu dir,  menu dir dir,
-dir ol ul,    dir ul ul,    dir menu ul,    dir dir ul,
-dir ol menu,  dir ul menu,  dir menu menu,  dir dir menu,
-dir ol dir,   dir ul dir,   dir menu dir,   dir dir dir {
-=======
 :matches(ul, ol, dir, menu) :matches(ul, ol, dir, menu) ul,
 :matches(ul, ol, dir, menu) :matches(ul, ol, dir, menu) menu,
 :matches(ul, ol, dir, menu) :matches(ul, ol, dir, menu) dir {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   list-style-type: square;
 }
 
 /* forms */
-<<<<<<< HEAD
-/* From http://dev.w3.org/csswg/css3-ui/#appearance */
-input {
-  -dompdf-appearance: textfield;
-}
-
-input[type=password] {
-  -dompdf-appearance: radio-button;
-}
-
-input[type=radio] {
-  -dompdf-appearance: password;
-}
-
-input[type=checkbox] {
-  -dompdf-appearance: checkbox;
-=======
 /* From https://drafts.csswg.org/css-ui-3/#default-style-sheet */
 form {
   display: block;
@@ -497,24 +371,10 @@ select {
   border: 1px solid #999;
   padding: 2px;
   margin: 2px;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 }
 
 input[type=button],
 input[type=submit],
-<<<<<<< HEAD
-input[type=reset] {
-  -dompdf-appearance: button;
-}
-
-select {
-  -dompdf-appearance: pop-up-menu;
-}
-
-textarea {
-  -dompdf-appearance: field;
-  display: block;
-=======
 input[type=reset],
 input[type=file],
 button {
@@ -598,35 +458,21 @@ select option {
 
 select option[selected] {
   display: inline;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 }
 
 fieldset {
   display: block;
-<<<<<<< HEAD
-  margin-left: 2px;
-  margin-right: 2px;
-  padding: 0.35em 0.625em 0.75em;
-=======
   margin: 0.6em 2px 2px;
   padding: 0.75em;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   border: 1pt groove #666;
   position: relative;
 }
 
 fieldset > legend {
   position: absolute;
-<<<<<<< HEAD
-  top: -1em;
-  white-space: nowrap;
-  padding-left: 4px;
-  padding-right: 2px;
-=======
   top: -0.6em;
   left: 0.75em;
   padding: 0 0.3em;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   background: white;
 }
 
@@ -643,38 +489,24 @@ hr {
   margin: 0.5em auto 0.5em auto;
 }
 
-<<<<<<< HEAD
-=======
 hr[size="1"] {
   border-style: solid none none none;
 }
 
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 iframe {
   border: 2px inset;
 }
 
 noframes {
-<<<<<<< HEAD
-  display: none;
-}
-
-br { 
-=======
   display: block;
 }
 
 br {
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
   display: -dompdf-br;
 }
 
 img, img_generated {
-<<<<<<< HEAD
-  display: -dompdf-image;
-=======
   display: -dompdf-image !important;
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
 }
 
 dompdf_generated {
@@ -683,13 +515,7 @@ dompdf_generated {
 
 /* hidden elements */
 area, base, basefont, head, meta, script, style, title,
-<<<<<<< HEAD
-noembed, noscript, param {
-  display: none;
-}
-=======
 noembed, param {
   display: none;
   -dompdf-keep: yes;
 }
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62

@@ -31,26 +31,15 @@ function invoice_logo()
  *
  * @return string
  */
-function invoice_logo_pdf()
-{
+function invoice_logo_pdf() {
     $CI = &get_instance();
-
     if ($CI->mdl_settings->setting('invoice_logo')) {
         //---it---inizio
         global $pdf_preview;
-<<<<<<< HEAD
-        if(@$pdf_preview)
-            return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';    // Supporto anteprima PDF
-        else
-        //---it---fine
-		return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';
-   }
-
-    return '';
-=======
         return '<img src="' . base_url() . 'uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';    // Supporto anteprima PDF
         //---it---fine
->>>>>>> 955424fcce2fd999f1b899078b3258c002cf5b62
+    }
+    return '';
 }
 
 

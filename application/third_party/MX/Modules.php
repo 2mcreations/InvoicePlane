@@ -80,9 +80,8 @@ class Modules
     /** Load a module controller **/
     public static function load($module)
     {
-        // @TODO @each will suppress errors but needs to be replaced if the function is removed in PHP 7.3
-        is_array($module) ? list($module, $params) = @each($module) : $params = NULL;
-
+        // each() was deprecated in PHP 7.2 and removed in PHP 8.0 - replaced with key()/current()
+        is_array($module) ? list($module, $params) = [key($module), current($module)] : $params = NULL;
         /* get the requested controller class name */
         $alias = strtolower(basename($module));
 
