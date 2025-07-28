@@ -5,10 +5,16 @@
   "homepage": "https://invoiceplane.com",
   "license": "MIT",
   "type": "project",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/InvoicePlane/mpdf.git"
+    }
+  ],
   
   "require": {
     "phpmailer/phpmailer": "^6.1.4",
-    "mpdf/mpdf": "^8.0",
+    "mpdf/mpdf": "dev-master",
     "vlucas/phpdotenv": "^2.4",
     "setasign/fpdi-fpdf": "^2.2.0",
     "codeigniter/framework": "3.1.11",
