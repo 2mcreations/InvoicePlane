@@ -1,5 +1,5 @@
 
-FROM php:7.3-apache
+FROM php:7.4-apache
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get --no-install-recommends install -y \
     curl \
@@ -7,12 +7,15 @@ RUN apt-get update && apt-get --no-install-recommends install -y \
     unzip \
     wget \
     zip \
-    nano
+    nano \
+    zlib1g-dev \
+    libpng-dev
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN docker-php-ext-install \
         pdo \
         pdo_mysql \
-        mysqli
+        mysqli \
+        gd
 RUN docker-php-ext-enable \
         pdo \
         pdo_mysql \
