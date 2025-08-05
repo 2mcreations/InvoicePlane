@@ -7,19 +7,29 @@ on:
 
 jobs:
   run:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         node: ['8', '10', '12']
     name: Node ${{ matrix.node }} build testing
     steps:
-      - uses: actions/checkout@v1
-      - name: Setup node
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - name: Install frontend dependencies
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node }}-
+
+      - name: Install dependencies
         run: npm install
-      - name: Try to build the assets
+
+      - name: Build frontend assets
         run: npm run build
