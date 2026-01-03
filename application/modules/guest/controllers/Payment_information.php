@@ -57,13 +57,10 @@ class Payment_Information extends Base_Controller
             foreach ($gateways as $driver => $fields) {
                 $d = mb_strtolower($driver);
 
+                // Se il gateway è abilitato, aggiungiamolo SEMPRE alla lista
+                // (ignorando il match tra payment_method della fattura e quello del gateway)
                 if (get_setting('gateway_' . $d . '_enabled') == 1) {
-                    $invoice_payment_method = $invoice->payment_method;
-                    $driver_payment_method  = get_setting('gateway_' . $d . '_payment_method');
-
-                    if ($invoice_payment_method == 0 || $driver_payment_method == 0 || $driver_payment_method == $invoice_payment_method) {
-                        $available_drivers[] = $driver;
-                    }
+                    $available_drivers[] = $driver;
                 }
             }
         }
@@ -102,9 +99,11 @@ class Payment_Information extends Base_Controller
      */
     public function stripe($invoice_url_key)
     {
-        // Get the api key for which the card token must be generated
+        $pubKey = get_setting('gateway_stripe_publishableKey');
+        if(!$pubKey) $pubKey = get_setting('gateway_stripe_apiKeyPublic'); // Fallback
+
         $data = [
-            'stripe_api_key'  => get_setting('gateway_stripe_apiKeyPublic'),
+            'stripe_api_key'  => $pubKey,
             'invoice_url_key' => $invoice_url_key,
         ];
         $this->load->view('guest/gateways/stripe', $data);
