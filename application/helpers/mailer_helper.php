@@ -88,9 +88,9 @@ function email_invoice(
         $errors[] = 'from_email';
     }
 
-    if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'cc_email';
-    }
+    #if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+    #    $errors[] = 'cc_email';
+    #}
 
     if ($bcc && ! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'bcc_email';
@@ -154,9 +154,9 @@ function email_quote(
         $errors[] = 'from_email';
     }
 
-    if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'cc_email';
-    }
+    #if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+    #    $errors[] = 'cc_email';
+    #}
 
     if ($bcc && ! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'bcc_email';
