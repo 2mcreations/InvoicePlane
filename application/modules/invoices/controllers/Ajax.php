@@ -74,7 +74,6 @@ class Ajax extends Admin_Controller
                     $item->item_price           = $item->item_price ? standardize_amount($item->item_price) : 0.0;
                     $item->item_discount_amount = $item->item_discount_amount ? standardize_amount($item->item_discount_amount) : null;
                     $item->item_product_id      = $item->item_product_id ? $item->item_product_id : null;
-                    $item->item_discount_percent = ($item->item_discount_percent) ? standardize_amount($item->item_discount_percent) : null;
                     $item->item_product_unit_id = $item->item_product_unit_id ? $item->item_product_unit_id : null;
                     $item->item_product_unit    = $this->mdl_units->get_name($item->item_product_unit_id, $item->item_quantity);
                     if (property_exists($item, 'item_date')) {
