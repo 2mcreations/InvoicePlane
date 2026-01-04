@@ -244,7 +244,7 @@ if ($legacy_calculation) {
                         <?php _trans('add_quote_tax'); ?>
                     </a>
                 </li>
-				<?php //---it---inizio ?>
+				<?php } //---it---inizio ?>
 				<li>
 					<a href="<?php echo site_url('quotes/preview_pdf/'.$quote->quote_id); ?>" id="btn_preview_pdf"
 					data-quote-id="<?php echo $quote_id; ?>" target="_blank">
