@@ -88,12 +88,29 @@ function email_invoice(
         $errors[] = 'from_email';
     }
 
-    #if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
-    #    $errors[] = 'cc_email';
-    #}
+    if ($cc) {
+        // Separa email multiple e valida solo quelle che contengono @
+        $cc_list = preg_split('/[,;\s]+/', trim($cc), -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($cc_list as $email) {
+            $email = trim($email);
+            // Valida solo se contiene @
+            if (strpos($email, '@') !== false && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'cc_email';
+                break;
+            }
+        }
+    }
 
-    if ($bcc && ! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'bcc_email';
+    if ($bcc) {
+        $bcc_list = preg_split('/[,;\s]+/', trim($bcc), -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($bcc_list as $email) {
+            $email = trim($email);
+            // Valida solo se contiene @
+            if (strpos($email, '@') !== false && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'bcc_email';
+                break;
+            }
+        }
     }
 
     check_mail_errors($errors, 'mailer/invoice/' . $invoice_id);
@@ -154,12 +171,29 @@ function email_quote(
         $errors[] = 'from_email';
     }
 
-    #if ($cc && ! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
-    #    $errors[] = 'cc_email';
-    #}
+    if ($cc) {
+        // Separa email multiple e valida solo quelle che contengono @
+        $cc_list = preg_split('/[,;\s]+/', trim($cc), -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($cc_list as $email) {
+            $email = trim($email);
+            // Valida solo se contiene @
+            if (strpos($email, '@') !== false && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'cc_email';
+                break;
+            }
+        }
+    }
 
-    if ($bcc && ! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'bcc_email';
+    if ($bcc) {
+        $bcc_list = preg_split('/[,;\s]+/', trim($bcc), -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($bcc_list as $email) {
+            $email = trim($email);
+            // Valida solo se contiene @
+            if (strpos($email, '@') !== false && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'bcc_email';
+                break;
+            }
+        }
     }
 
     check_mail_errors($errors, 'mailer/quote/' . $quote_id);
