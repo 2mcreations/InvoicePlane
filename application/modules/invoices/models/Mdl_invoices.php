@@ -320,7 +320,7 @@ class Mdl_Invoices extends Response_Model
                 'item_task_id'         => $invoice_item->item_task_id,
                 'item_name'            => $invoice_item->item_name,
                 'item_description'     => $invoice_item->item_description,
-                'item_quantity'        => $invoice_item->item_quantity * -1,
+                'item_quantity'        => $invoice_item->item_quantity ? abs($invoice_item->item_quantity) : $invoice_item->item_quantity,
                 'item_price'           => $invoice_item->item_price,
                 'item_discount_amount' => $invoice_item->item_discount_amount,
                 'item_order'           => $invoice_item->item_order,
@@ -339,7 +339,7 @@ class Mdl_Invoices extends Response_Model
                 'invoice_id'              => $target_id,
                 'tax_rate_id'             => $invoice_tax_rate->tax_rate_id,
                 'include_item_tax'        => $invoice_tax_rate->include_item_tax,
-                'invoice_tax_rate_amount' => -$invoice_tax_rate->invoice_tax_rate_amount,
+                'invoice_tax_rate_amount' => $invoice_tax_rate->invoice_tax_rate_amount ? abs($invoice_tax_rate->invoice_tax_rate_amount) : 0,
             ];
 
             $this->mdl_invoice_tax_rates->save(null, $db_array);

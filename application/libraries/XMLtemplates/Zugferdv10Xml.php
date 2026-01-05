@@ -123,7 +123,7 @@ class Zugferdv10Xml
         $node = $this->doc->createElement('rsm:HeaderExchangedDocument');
 
         $node->appendChild($this->doc->createElement('ram:ID', $this->invoice->invoice_number));
-        $node->appendChild($this->doc->createElement('ram:Name', trans('invoice')));
+        $node->appendChild($this->doc->createElement('ram:Name', ((isset($is_credit_invoice) && $is_credit_invoice) ? trans('credit_invoice') : trans('invoice'))));
         $node->appendChild($this->doc->createElement('ram:TypeCode', 380));
 
         // IssueDateTime

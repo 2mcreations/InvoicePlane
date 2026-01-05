@@ -155,7 +155,7 @@ class Invoices extends Admin_Controller
         if ( ! $invoice) {
             show_404();
         }
-
+        $is_credit_invoice = (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1);
         $custom_fields = $this->mdl_custom_fields->by_table('ip_invoice_custom')->get()->result();
         $custom_values = [];
         foreach ($custom_fields as $custom_field) {
@@ -194,6 +194,7 @@ class Invoices extends Admin_Controller
                 'invoice'           => $invoice,
                 'items'             => $items,
                 'invoice_id'        => $invoice_id,
+                'is_credit_invoice' => $is_credit_invoice,
                 'einvoice'          => $einvoice,
                 'change_user'       => $change_user,
                 'tax_rates'         => $this->mdl_tax_rates->get()->result(),
@@ -355,15 +356,22 @@ class Invoices extends Admin_Controller
     	]);
     	
     	// Dati fattura
-    	$fatturapa->set_intestazione([
-    			// Tipo documento - https://git.io/fhmMb (default = TD01 = fattura)
-    			'tipodoc' => "TD01",
-    			// Valuta (default = EUR)
-    			'valuta' => 'EUR',
-    			// Data e numero fattura
-    			'data' => $invoice->invoice_date_created,
-    			'numero' => $invoice->invoice_number,
-    	]);
+        // Determina il tipo di documento in base allo stato della fattura
+        $tipo_documento = "TD01";  // Default: fattura ordinaria
+
+        if (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1) {
+            $tipo_documento = "TD04";  // Nota di credito
+        }
+
+        $fatturapa->set_intestazione([
+                // Tipo documento dinamico
+                'tipodoc' => $tipo_documento,
+                // Valuta (default = EUR)
+                'valuta' => 'EUR',
+                // Data e numero fattura
+                'data' => $invoice->invoice_date_created,
+                'numero' => $invoice->invoice_number,
+        ]);
     	
     	$this->load->model('invoices/mdl_items');
     	$items = $this->mdl_items->where('invoice_id', $invoice_id)->get()->result();
@@ -485,7 +493,12 @@ class Invoices extends Admin_Controller
             $generator = (empty($xml_setting['generator']) ? $generator : $xml_setting['generator']); // Optional
         }
 
-        $filename = trans('invoice') . '_' . str_replace(['\\', '/'], '_', $invoice->invoice_number);
+        if (isset($is_credit_invoice) && $is_credit_invoice) {
+            $filename = trans('credit_invoice');
+        } else {
+            $filename = trans('invoice');
+        }
+        $filename .= '_' . str_replace(['\\', '/'], '_', $invoice->invoice_number); 
         $path     = generate_xml_invoice_file($invoice, $items, $generator, $filename, $options);
         $this->output->set_content_type('text/xml');
         $this->output->set_output(file_get_contents($path));

@@ -6,8 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
     <title>
-        <?php echo get_setting('custom_title', 'InvoicePlane', true); ?>
-        - <?php _trans('invoice'); ?> <?php echo $invoice->invoice_number; ?>
+        <?php 
+        echo get_setting('custom_title', 'InvoicePlane', true) . ' - ';
+        if (isset($is_credit_invoice) && $is_credit_invoice) { 
+            echo trans('credit_invoice'); 
+        } else { 
+            echo trans('invoice'); 
+        }
+        echo ' ' . $invoice->invoice_number;
+        ?>
     </title>
 
     <link rel="icon" href="<?php _core_asset('img/favicon.png'); ?>" type="image/png">
@@ -21,7 +28,7 @@
 
             <div class="webpreview-header">
 
-                <h2><?php _trans('invoice'); ?>&nbsp;<?php echo $invoice->invoice_number; ?></h2>
+                <h2><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?>&nbsp;<?php echo $invoice->invoice_number; ?></h2>
 
                 <div class="btn-group">
 <?php

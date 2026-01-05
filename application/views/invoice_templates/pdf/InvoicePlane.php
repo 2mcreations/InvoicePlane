@@ -40,7 +40,7 @@ switch ($invoice_mode) {
 <html lang="<?php _trans('cldr'); ?>">
 <head>
     <meta charset="utf-8">
-    <title><?php echo get_setting('custom_title', 'InvoicePlane', true); ?> - <?php _trans('invoice'); ?></title>
+    <title><?php echo get_setting('custom_title', 'InvoicePlane', true); ?> - <?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></title>
     <link rel="stylesheet" href="<?php _theme_asset('css/templates.css'); ?>" type="text/css">
     <link rel="stylesheet" href="<?php _core_asset('css/custom-pdf.css'); ?>" type="text/css">
 </head>
@@ -168,7 +168,7 @@ if ($payment_method) {
         </table>
     </div>
 
-    <h1 class="invoice-title <?php echo $text_class ?>"><?php _trans('invoice') ?> <?php _htmlsc($invoice->invoice_number) ?></h1>
+    <h1 class="invoice-title <?php echo $text_class ?>"><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?> <?php _htmlsc($invoice->invoice_number) ?></h1>
 
     <table class="item-table">
         <thead>
@@ -371,7 +371,7 @@ if ($invoice->invoice_terms) {
 
 <htmlpagefooter name="footer">
     <footer>
-        <?php _trans('invoice'); ?> <?php echo $invoice->invoice_number; ?> - <?php _trans('page'); ?> {PAGENO} / {nbpg}
+        <?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?> <?php echo $invoice->invoice_number; ?> - <?php _trans('page'); ?> {PAGENO} / {nbpg}
     </footer>
 </htmlpagefooter>
 

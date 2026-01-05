@@ -58,7 +58,7 @@ class Mdl_Payments extends Response_Model
         return [
             'invoice_id' => [
                 'field' => 'invoice_id',
-                'label' => trans('invoice'),
+                'label' => trans('invoice') . '/' . trans('credit_invoice'),
                 'rules' => 'required',
             ],
             'payment_date' => [

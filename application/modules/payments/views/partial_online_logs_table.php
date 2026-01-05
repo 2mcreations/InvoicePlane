@@ -4,7 +4,7 @@
                 <thead>
                 <tr>
                     <th><?php _trans('id'); ?></th>
-                    <th><?php _trans('invoice'); ?></th>
+                    <th><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></th>
                     <th><?php _trans('transaction_successful'); ?></th>
                     <th><?php _trans('payment_date'); ?></th>
                     <th><?php _trans('payment_provider'); ?></th>
@@ -21,7 +21,7 @@ foreach ($payment_logs as $log) {
                         <td><?php echo $log->merchant_response_id; ?></td>
                         <td>
                             <a href="<?php echo site_url('invoices/view/' . $log->invoice_id); ?>"
-                               title="<?php _trans('invoice'); ?>">
+                               title="<?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?>">
                                 <?php echo $log->invoice_number ? $log->invoice_number : $log->invoice_id; ?>
                             </a>
                         </td>

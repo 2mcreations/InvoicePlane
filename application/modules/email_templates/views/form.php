@@ -29,7 +29,7 @@
                         <label>
                             <input type="radio" name="email_template_type" id="email_template_type_invoice"
                                    value="invoice" checked>
-                            <?php _trans('invoice'); ?>
+                            <?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?>
                         </label>
                     </div>
                     <div class="radio">

@@ -10,7 +10,7 @@ if ($invoice_tax_rates) {
 }
 ?>
 <div id="headerbar">
-    <h1 class="headerbar-title"><?php _trans('invoice'); ?> #<?php echo $invoice->invoice_number; ?></h1>
+    <h1 class="headerbar-title"><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?> #<?php echo $invoice->invoice_number; ?></h1>
 
     <div class="headerbar-item pull-right">
         <div class="btn-group btn-group-sm">
@@ -78,7 +78,7 @@ if ($invoice->client_email) {
 
                     <table class="table table-bordered">
                         <tr>
-                            <td><?php _trans('invoice'); ?> #</td>
+                            <td><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?> #</td>
                             <td><?php echo $invoice->invoice_number; ?></td>
                         </tr>
                         <tr>

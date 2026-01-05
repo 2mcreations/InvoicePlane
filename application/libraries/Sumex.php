@@ -293,7 +293,13 @@ class Sumex
             $custom_fields['quote'] = $CI->mdl_custom_fields->get_values_for_fields('mdl_quote_custom', $this->invoice->quote_id);
         }
 
-        $filename = trans('invoice') . '_' . str_replace(['\\', '/'], '_', $this->invoice->invoice_number);
+        if (isset($is_credit_invoice) && $is_credit_invoice) {
+            $filename = trans('credit_invoice');
+        } else {
+            $filename = trans('invoice');
+        }
+        $filename .= '_' . str_replace(['\\', '/'], '_', $this->invoice->invoice_number);
+
         // Create the SUMEX XML file (embed)
         $path = UPLOADS_TEMP_FOLDER . $filename . '.xml';
         file_put_contents($path, $this->xml());
@@ -301,7 +307,7 @@ class Sumex
             'path'           => $path,
             'name'           => 'sumex.xml', // todo: what's need in real
             'mime'           => 'text/xml',
-            'description'    => 'SUMEX ' . trans('invoice'),
+            'description'    => 'SUMEX ' . ((isset($is_credit_invoice) && $is_credit_invoice) ? trans('credit_invoice') : trans('invoice')),
             'AFRelationship' => 'Alternative',
         ]];
 

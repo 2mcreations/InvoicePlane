@@ -42,7 +42,7 @@ class Mdl_invoice_sumex extends Response_Model
         return [
             'sumex_invoice' => [
                 'field' => 'sumex_invoice',
-                'label' => trans('invoice'),
+                'label' => trans('invoice') . '/' . trans('credit_invoice'),
                 'rules' => 'required',
             ],
             'sumex_reason' => [

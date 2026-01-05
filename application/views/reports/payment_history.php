@@ -11,7 +11,7 @@
     <table>
         <tr>
             <th><?php _trans('date'); ?></th>
-            <th><?php _trans('invoice'); ?></th>
+            <th><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></th>
             <th><?php _trans('client'); ?></th>
             <th><?php _trans('payment_method'); ?></th>
             <th><?php _trans('note'); ?></th>

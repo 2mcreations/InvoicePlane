@@ -45,6 +45,7 @@ class View extends Base_Controller
         $this->load->helper('template');
 
         $invoice = $invoice->row();
+        $is_credit_invoice = (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1);
 
         if ($this->session->userdata('user_type') != 1 && $invoice->invoice_status_id == 2) {
             $this->mdl_invoices->mark_viewed($invoice->invoice_id);
@@ -75,6 +76,7 @@ class View extends Base_Controller
             'flash_message'      => $this->session->flashdata('flash_message'),
             'payment_method'     => $payment_method,
             'is_overdue'         => $is_overdue,
+            'is_credit_invoice'  => $is_credit_invoice,
             'attachments'        => $attachments,
             'custom_fields'      => $custom_fields,
             'legacy_calculation' => config_item('legacy_calculation'),

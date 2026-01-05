@@ -202,7 +202,14 @@ echo $legacy_calculation ? $modal_add_invoice_tax : ''; // Legacy calculation ha
 <div id="headerbar">
     <h1 class="headerbar-title">
         <span data-toggle="tooltip" data-placement="bottom" title="<?php _trans('invoicing'); ?>: <?php _htmlsc(PHP_EOL . format_user($invoice->user_id)); ?>">
-            <?php echo trans('invoice') . ' ' . ($invoice->invoice_number ? '#' . $invoice->invoice_number : trans('id') . ': ' . $invoice->invoice_id); ?>
+            <?php 
+            if (isset($is_credit_invoice) && $is_credit_invoice) {
+                echo trans('credit_invoice');
+            } else {
+                echo trans('invoice');
+            }
+            echo ' ' . ($invoice->invoice_number ? '#' . $invoice->invoice_number : trans('id') . ': ' . $invoice->invoice_id);
+            ?>
         </span>
 <?php
 // Nb Admins > 1 only
@@ -542,7 +549,7 @@ foreach ($invoice_statuses as $key => $status) {
                                 </div>
 
                                 <div class="invoice-properties">
-                                    <label><?php _trans('invoice'); ?> #</label>
+                                    <label><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?> #</label>
                                     <input type="text" id="invoice_number"
                                            class="form-control"
                                         <?php if ($invoice->invoice_number) : ?>

@@ -72,6 +72,7 @@ function generate_invoice_pdf($invoice_id, $stream = true, $invoice_template = n
 
     $invoice = $CI->mdl_invoices->get_by_id($invoice_id);
     $invoice = $CI->mdl_invoices->get_payments($invoice);
+    $is_credit_invoice = (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1);
 
     // Override system language with client language
     set_language($invoice->client_language);
@@ -109,7 +110,8 @@ function generate_invoice_pdf($invoice_id, $stream = true, $invoice_template = n
         $custom_fields['quote'] = $CI->mdl_custom_fields->get_values_for_fields('mdl_quote_custom', $invoice->quote_id);
     }
 
-    $filename = trans('invoice') . '_' . str_replace(['\\', '/'], '_', $invoice->invoice_number);
+    $filename = ((isset($is_credit_invoice) && $is_credit_invoice) ? trans('credit_invoice') : trans('invoice')) 
+                . ' ' . str_replace(['\\', '/'], ' ', $invoice->invoice_number);
 
     // START eInvoicing
     $xml_id    = false;
@@ -154,6 +156,7 @@ function generate_invoice_pdf($invoice_id, $stream = true, $invoice_template = n
         'show_item_discounts' => $show_item_discounts,
         'custom_fields'       => $custom_fields,
         'legacy_calculation'  => config_item('legacy_calculation'),
+        'is_credit_invoice'   => $is_credit_invoice,
     ];
 
     $html = $CI->load->view('invoice_templates/pdf/' . $invoice_template, $data, true);
@@ -221,7 +224,13 @@ function generate_invoice_sumex($invoice_id, $stream = true, $invoice_template =
     $sumexPDF = $CI->sumex->pdf($invoice_template);
     $sha1sum  = sha1($sumexPDF);
     $shortsum = mb_substr($sha1sum, 0, 8);
-    $filename = trans('invoice') . '_' . str_replace(['\\', '/'], '_', $invoice->invoice_number) . '_' . $shortsum;
+
+    if (isset($is_credit_invoice) && $is_credit_invoice) {
+    $filename = trans('credit_invoice');
+    } else {
+        $filename = trans('invoice');
+    }
+    $filename .= ' ' . str_replace(['\\', '/'], ' ', $invoice->invoice_number) . ' ' . $shortsum;
 
     if ( ! $client) {
         $temp = tempnam('/tmp', 'invsumex_');
@@ -289,6 +298,7 @@ function generate_quote_pdf($quote_id, $stream = true, $quote_template = null, $
     );
 
     $quote = $CI->mdl_quotes->get_by_id($quote_id);
+    $is_credit_invoice = (isset($quote->quote_sign) && $quote->quote_sign == -1);
 
     // Override language with system language
     set_language($quote->client_language);
@@ -330,6 +340,7 @@ function generate_quote_pdf($quote_id, $stream = true, $quote_template = null, $
         'show_item_discounts' => $show_item_discounts,
         'custom_fields'       => $custom_fields,
         'legacy_calculation'  => config_item('legacy_calculation'),
+        'is_credit_invoice'   => $is_credit_invoice,
     ];
 
     $html = $CI->load->view('quote_templates/pdf/' . $quote_template, $data, true);

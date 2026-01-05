@@ -3,7 +3,7 @@
 
                 <thead>
                     <tr>
-                        <th><?php _trans('invoice'); ?></th>
+                        <th><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></th>
                         <th><?php _trans('created'); ?></th>
                         <th><?php _trans('due_date'); ?></th>
                         <th><?php _trans('client_name'); ?></th>

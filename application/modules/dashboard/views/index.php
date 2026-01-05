@@ -200,7 +200,7 @@ foreach ($quotes as $quote) {
                         <tr>
                             <th><?php _trans('status'); ?></th>
                             <th style="min-width: 15%;"><?php _trans('due_date'); ?></th>
-                            <th style="min-width: 15%;"><?php _trans('invoice'); ?></th>
+                            <th style="min-width: 15%;"><?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></th>
                             <th style="min-width: 35%;"><?php _trans('client'); ?></th>
                             <th class="amount"><?php _trans('balance'); ?></th>
                             <th></th>

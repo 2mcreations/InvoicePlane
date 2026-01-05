@@ -359,7 +359,7 @@ if ($client->client_einvoicing_active && $user_fields_nook) {
                             >
                                 <thead class="einvoice-users-check-lists">
                                     <tr><th colspan="3"><?php _trans('required_fields'); ?> (<?php _trans('user' . ($nb_users > 1 ? 's' : '')); ?>)</th></tr>
-                                    <tr><th><?php _trans('user'); ?></th><th class="text-nowrap">e-<?php _trans('invoice'); ?></th><th><?php _trans('errors'); ?></th></tr>
+                                    <tr><th><?php _trans('user'); ?></th><th class="text-nowrap">e-<?php if (isset($is_credit_invoice) && $is_credit_invoice) { _trans('credit_invoice'); } else { _trans('invoice'); } ?></th><th><?php _trans('errors'); ?></th></tr>
                                 </thead>
 <?php
     // eInvoicing panel User(s) checks table

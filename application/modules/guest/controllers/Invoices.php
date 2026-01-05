@@ -81,6 +81,7 @@ class Invoices extends Guest_Controller
             show_404();
         }
 
+        $is_credit_invoice = (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1);
         $this->mdl_invoices->mark_viewed($invoice->invoice_id);
 
         $this->load->model(
@@ -101,6 +102,7 @@ class Invoices extends Guest_Controller
                 'invoice_tax_rates'      => $this->mdl_invoice_tax_rates->where('invoice_id', $invoice_id)->get()->result(),
                 'enable_online_payments' => get_setting('enable_online_payments'),
                 'legacy_calculation'     => config_item('legacy_calculation'),
+                'is_credit_invoice'      => $is_credit_invoice,
             ]
         );
 
