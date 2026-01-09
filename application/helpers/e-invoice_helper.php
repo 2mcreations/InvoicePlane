@@ -139,7 +139,6 @@ function get_req_fields_einvoice($client = null, $user_id = ''): object
     $c->city      = $cid && $client->client_city      == '' ? 1 : 0;
     $c->country   = $cid && $client->client_country   == '' ? 1 : 0;
     $c->company   = $cid && $client->client_company   == '' ? 1 : 0;
-    $c->tax_code  = $cid && $client->client_tax_code  == '' ? 1 : 0;
     $c->vat_id    = $cid && $client->client_vat_id    == '' ? 1 : 0;
     // Tweak to run with or without VAT
     if ($c->company + $c->vat_id == 2) {
@@ -199,10 +198,9 @@ function get_req_fields_einvoice($client = null, $user_id = ''): object
         $u->tr_show_city      = $u->city      + $c->city      > 0 ? 1 : 0;
         $u->tr_show_country   = $u->country   + $c->country   > 0 ? 1 : 0;
         $u->tr_show_company   = $u->company   + $c->company   > 0 ? 1 : 0;
-        $u->tr_show_tax_code  = $u->tax_code  + $c->tax_code  > 0 ? 1 : 0;
         $u->tr_show_vat_id    = $u->vat_id    + $c->vat_id    > 0 ? 1 : 0;
         // Show user table when sum of tr_show > 0
-        $u->show_table = $u->tr_show_address_1 + $u->tr_show_zip + $u->tr_show_city + $u->tr_show_country + $u->tr_show_company + $u->tr_show_tax_code + $u->tr_show_vat_id > 0 ? 1 : 0;
+        $u->show_table = $u->tr_show_address_1 + $u->tr_show_zip + $u->tr_show_city + $u->tr_show_country + $u->tr_show_company + $u->tr_show_vat_id > 0 ? 1 : 0;
 
         // No nessessary to check but for handly loop in view
         $u->user_name = $o->user_name;

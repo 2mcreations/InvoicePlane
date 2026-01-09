@@ -334,7 +334,7 @@ foreach ($custom_fields as $custom_field) {
                             </div>
                         </div>
 
-                        <div class="form-group"<?php echo $einvoicingReq; ?>>
+                        <div class="form-group"<?php echo $einvoicingOpt; ?>>
                             <label for="client_tax_code"><?php _trans('tax_code'); ?></label>
 
                             <div class="controls">
