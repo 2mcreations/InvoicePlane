@@ -256,6 +256,7 @@ class Fatturapav12Xml
             if (empty($denominazione)) {
                 throw new Exception('Per persone giuridiche (P.IVA 11 cifre) è obbligatorio compilare il campo "Azienda/Ente" nel cliente.');
             }
+            $destinatario['ragsoc'] = $denominazione;
             
             if (!empty($this->invoice->client_vat_id)) {
                 $destinatario['piva'] = trim($this->invoice->client_vat_id);
@@ -403,6 +404,10 @@ class Fatturapav12Xml
             // Aggiungi IBAN solo per bonifico
             if ($modalita_pagamento === 'MP05' && $this->invoice->user_iban) {
                 $pagamento_dettaglio['iban'] = $this->noSpace($this->invoice->user_iban);
+
+                if (!empty($this->invoice->user_bic)) {
+                    $pagamento_dettaglio['bic'] = $this->noSpace($this->invoice->user_bic);
+                }
             }
             
             $fatturapa->set_pagamento($pagamento_dati, [$pagamento_dettaglio]);
