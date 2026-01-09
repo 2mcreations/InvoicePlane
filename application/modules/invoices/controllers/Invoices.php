@@ -263,204 +263,159 @@ class Invoices extends Admin_Controller
 
         generate_invoice_pdf($invoice_id, $stream, $invoice_template, null);
     }
-	
-    //---it---inizio
+
     /**
      * General XML Fattura Eletronica e lancia il download dell'XML
      * @param int $invoice_id
      */
     public function generate_xml($invoice_id)
     {
-    	$invoice = $this->mdl_invoices->get_by_id($invoice_id);
-    	$user_id = $invoice->user_id;
-    	$this->load->model('users/mdl_users');
-    	$user = $this->mdl_users->get_by_id($user_id);
-    	
-    	// Preleva campi custom
-    	$customs = [];
-    	// utente: regime fiscale
-    	foreach ([
-    	'IT_UTENTE_REGIMEFISC_ID'  => 'utente_regimefisc',
-    	'IT_UTENTE_NATURA_IVA0_ID' => 'utente_natura_iva0',
-    	'IT_UTENTE_PROGR_XML_ID'   => 'utente_progr_xml',
-    	] as $env => $key)
-    	{
-    		$customs[$key] = NULL;
-    		if (env($env))
-    		{
-    			$this->load->model('custom_fields/mdl_user_custom');
-    			$user_custom = $this->mdl_user_custom->by_id($user_id)->where('user_custom_fieldid', env($env))->get()->row();
-    			if ($user_custom)
-    			{
-    				$customs[$key] = $user_custom->user_custom_fieldvalue ? $user_custom->user_custom_fieldvalue : NULL;
-    			}
-    		}
-    	}
-    	// cliente: formato xml, codice e/o pec sdi
-    	$client_id = $invoice->client_id;
-    	foreach ([
-    	'IT_CLIENTE_FORMATO_XML_ID' => 'cliente_formato_xml',
-    	'IT_CLIENTE_SDI_CODICE_ID'  => 'cliente_sdi_codice',
-    	'IT_CLIENTE_SDI_PEC_ID'     => 'cliente_sdi_pec',
-    	] as $env => $key)
-    	{
-    		$customs[$key] = NULL;
-    		if (env($env))
-    		{
-    			$this->load->model('custom_fields/mdl_client_custom');
-    			$client_custom = $this->mdl_client_custom->by_id($client_id)->where('client_custom_fieldid', env($env))->get()->row();
-    			if ($client_custom)
-    			{
-    				$customs[$key] = $client_custom->client_custom_fieldvalue ? $client_custom->client_custom_fieldvalue : NULL;
-    			}
-    		}
-    	}
-    	
-    	// Genera XML fattura elettronica
-    	// https://github.com/s2software/fatturapa
-    	require_once(APPPATH.'libraries/fatturapa/fatturapa.php');
-    	$formato = $customs['cliente_formato_xml'] ? $customs['cliente_formato_xml'] : 'FPR12';
-    	$fatturapa = new FatturaPA($formato);	// privato vs pa
-    	
-    	// Mittente
-    	$fatturapa->set_mittente([
-    			// Dati azienda emittente fattura
-    			'ragsoc' => $invoice->user_name,
-    			'indirizzo' => $invoice->user_address_1,
-    			'cap' => $invoice->user_zip,
-    			'comune' => $invoice->user_city,
-    			'prov' => $invoice->user_state,
-    			'paese' => $invoice->user_country ? $invoice->user_country : 'IT',
-    			'piva' => $invoice->user_vat_id ? $invoice->user_vat_id : NULL,
-    			'codfisc' => $invoice->user_tax_code ? $invoice->user_tax_code : NULL,
-    			// Regime fiscale - https://git.io/fhmMd
-    			'regimefisc' => $customs['utente_regimefisc'],
-    	]);
-    	
-    	// Destinatario
-    	$fatturapa->set_destinatario([
-    			// Dati cliente destinatario fattura
-    			'ragsoc' => $invoice->client_name,
-    			'indirizzo' => $invoice->client_address_1,
-    			'cap' => $invoice->client_zip,
-    			'comune' => $invoice->client_city,
-    			'prov' => $invoice->client_state,
-    			'paese' => $invoice->client_country ? $invoice->client_country : 'IT',
-    			'piva' => $invoice->client_vat_id ? $invoice->client_vat_id : NULL,
-    			'codfisc' => $invoice->client_tax_code ? $invoice->client_tax_code : NULL,
-    			// Dati SdI (Sistema di Interscambio) del destinatario/cliente
-    			// - Codice destinatario - da impostare in alternativa alla PEC
-    			'sdi_codice' => $customs['cliente_sdi_codice'],
-    			// - PEC destinatario - da impostare in alternativa al Codice
-    			'sdi_pec' => $customs['cliente_sdi_pec'],
-    	]);
-    	
-    	// Dati fattura
-        // Determina il tipo di documento in base allo stato della fattura
-        $tipo_documento = "TD01";  // Default: fattura ordinaria
-
-        if (isset($invoice->invoice_sign) && $invoice->invoice_sign == -1) {
-            $tipo_documento = "TD04";  // Nota di credito
+        // Carica helper
+        $this->load->helper('e-invoice');
+        $this->load->model('invoices/mdl_items');
+        $this->load->model('users/mdl_users');
+        $this->load->model('custom_fields/mdl_user_custom');
+        $this->load->model('custom_fields/mdl_client_custom');
+        
+        // Ottieni invoice e items
+        $invoice = $this->mdl_invoices->get_by_id($invoice_id);
+        $items = $this->mdl_items->where('invoice_id', $invoice_id)->get()->result();
+        
+        if (!$invoice) {
+            show_404();
+            return;
         }
-
-        $fatturapa->set_intestazione([
-                // Tipo documento dinamico
-                'tipodoc' => $tipo_documento,
-                // Valuta (default = EUR)
-                'valuta' => 'EUR',
-                // Data e numero fattura
-                'data' => $invoice->invoice_date_created,
-                'numero' => $invoice->invoice_number,
-        ]);
-    	
-    	$this->load->model('invoices/mdl_items');
-    	$items = $this->mdl_items->where('invoice_id', $invoice_id)->get()->result();
-    	
-    	// Righe dettagli
-    	foreach ($items as $i => $item)
-    	{
-    		$description = trim($item->item_name) ? $item->item_name : '';
-    		if ($item->item_description)
-    		{
-    			if ($description)
-    				$description .= ' - ';
-    			$description .= $item->item_description;
-    		}
-    		$fatturapa->add_riga([
-    				// Numero progressivo riga dettaglio
-    				'num'         => $i+1,
-    				// Descrizione prodotto/servizio
-    				'descrizione' => $description,
-    				// Prezzo unitario del prodotto/servizio
-    				'prezzo'      => FatturaPA::dec($item->item_price),
-    				// Quantità
-    				'qta'         => FatturaPA::dec($item->item_quantity),
-    				// Prezzo totale (prezzo x qta)
-    				'importo'     => FatturaPA::dec($item->item_subtotal), // imponibile riga
-    				// % aliquota IVA
-    				'perciva'     => FatturaPA::dec($item->item_tax_rate_percent),	// NOTA: quindi per funzionare, l'iva va messa sulle righe
-    				// (natura IVA non indicata, se l'iva è a 0)
-    				'natura_iva0' => $item->item_tax_rate_percent == 0 ? $customs['utente_natura_iva0'] : NULL
-    		]);
-    	}
-    	
-    	// Totale
-    	$merge = [];
-    	$merge['esigiva'] = 'I';	// esigibilità IVA (scritta nell'XML solo se viene applicata l'IVA)
-    	$totale = $fatturapa->set_auto_totali($merge, ['autobollo' => TRUE]);
-    	
-    	// Pagamento
-    	if ($invoice->payment_method)
-    	{
-    		$payment_method_id = $invoice->payment_method;
-    		$env = "IT_METODO_PAGAMENTO_ID_{$payment_method_id}_CODICE";
-    		if (env($env))
-    		{
-    			// Modalità (possibile più di una) https://git.io/fhmDu
-    			$modalita = [
-    					'modalita' => env($env),	// codice pagamento corrispondente
-    					'totale'   => FatturaPA::dec($totale),	// totale iva inclusa
-    					'scadenza' => $invoice->invoice_date_due,
-    			];
-    			
-    			if (env($env) == "MP05" && !empty($user->user_iban))	// bonifico: scrive anche l'iban
-    			{
-    				$modalita['iban'] = $user->user_iban;
-    			}
-    			
-    			$fatturapa->set_pagamento([
-    					// Condizioni pagamento - https://git.io/fhmD8 (default: TP02 = completo)
-    					'condizioni' => "TP02"
-    			], $modalita);
-    		}
-    	}
-    	
-    	// XML:
-    	// Progressivo: se campo Prossimo progressivo impostato, usa quello, altrimenti
-    	// calcola il progressivo tramite il numero fattura, togliendo i catatteri non numerici
-    	$progr = '';
-    	if (isset($customs['utente_progr_xml']))
-    	{
-    		$progr = empty($customs['utente_progr_xml']) ? 1 : $customs['utente_progr_xml'];
-    		// incrementa
-    		//$this->mdl_user_custom->by_id($user_id)->where('user_custom_fieldid', env($env))->get()->row();
-    		$this->mdl_user_custom->save_custom($user_id, [env('IT_UTENTE_PROGR_XML_ID') => $progr+1]);
-    	}
-    	else	// converte il numero (toglie cioè che non è un numero) in base36 (il massimo per il progressivo nel nome file è 5 caratteri)
-    	{
-    		$num = preg_replace("/[^0-9]/", '', $invoice->invoice_number);
-    		$progr = strtoupper(base_convert($num, 10, 36));
-    	}
-    	
-    	// Genera XML
-    	$filename = $fatturapa->filename($progr);
-    	$xml = $fatturapa->get_xml();
-    	
-    	// Scarica XML
-    	$this->load->helper('download');
-    	force_download($filename, $xml);
+        
+        $user_id = $invoice->user_id;
+        $client_id = $invoice->client_id;
+        
+        // === DEBUG: Verifica ENV variables ===
+        log_message('debug', '=== GENERATE_XML START ===');
+        log_message('debug', "Invoice ID: {$invoice_id}");
+        log_message('debug', "User ID: {$user_id}");
+        log_message('debug', "Client ID: {$client_id}");
+        log_message('debug', 'IT_UTENTE_REGIMEFISC_ID: ' . (env('IT_UTENTE_REGIMEFISC_ID') ?: 'NON IMPOSTATO'));
+        log_message('debug', 'IT_UTENTE_NATURA_IVA0_ID: ' . (env('IT_UTENTE_NATURA_IVA0_ID') ?: 'NON IMPOSTATO'));
+        log_message('debug', 'IT_CLIENTE_SDI_CODICE_ID: ' . (env('IT_CLIENTE_SDI_CODICE_ID') ?: 'NON IMPOSTATO'));
+        log_message('debug', 'IT_CLIENTE_SDI_PEC_ID: ' . (env('IT_CLIENTE_SDI_PEC_ID') ?: 'NON IMPOSTATO'));
+        
+        // Recupera custom fields UTENTE
+        $regimefisc = null;
+        $natura_iva0 = null;
+        
+        if (env('IT_UTENTE_REGIMEFISC_ID')) {
+            $field_id = env('IT_UTENTE_REGIMEFISC_ID');
+            log_message('debug', "Cerco regime fiscale - field_id: {$field_id}, user_id: {$user_id}");
+            
+            $user_custom = $this->mdl_user_custom->by_id($user_id)
+                ->where('user_custom_fieldid', $field_id)
+                ->get()->row();
+            
+            log_message('debug', 'Query user_custom result: ' . print_r($user_custom, true));
+            
+            if ($user_custom && !empty($user_custom->user_custom_fieldvalue)) {
+                $regimefisc = $user_custom->user_custom_fieldvalue;
+                log_message('debug', "Regime fiscale TROVATO: {$regimefisc}");
+            } else {
+                log_message('error', 'REGIME FISCALE NON TROVATO per user_id: ' . $user_id);
+            }
+        } else {
+            log_message('error', 'ENV IT_UTENTE_REGIMEFISC_ID non impostata');
+        }
+        
+        if (env('IT_UTENTE_NATURA_IVA0_ID')) {
+            $user_custom = $this->mdl_user_custom->by_id($user_id)
+                ->where('user_custom_fieldid', env('IT_UTENTE_NATURA_IVA0_ID'))
+                ->get()->row();
+            if ($user_custom && !empty($user_custom->user_custom_fieldvalue)) {
+                $natura_iva0 = $user_custom->user_custom_fieldvalue;
+                log_message('debug', "Natura IVA0 trovata: {$natura_iva0}");
+            }
+        }
+        
+        // Recupera custom fields CLIENTE
+        $sdi_codice = null;
+        $sdi_pec = null;
+        
+        if (env('IT_CLIENTE_SDI_CODICE_ID')) {
+            $client_custom = $this->mdl_client_custom->by_id($client_id)
+                ->where('client_custom_fieldid', env('IT_CLIENTE_SDI_CODICE_ID'))
+                ->get()->row();
+            if ($client_custom && !empty($client_custom->client_custom_fieldvalue)) {
+                $sdi_codice = $client_custom->client_custom_fieldvalue;
+                log_message('debug', "SDI Codice trovato: {$sdi_codice}");
+            }
+        }
+        
+        if (env('IT_CLIENTE_SDI_PEC_ID')) {
+            $client_custom = $this->mdl_client_custom->by_id($client_id)
+                ->where('client_custom_fieldid', env('IT_CLIENTE_SDI_PEC_ID'))
+                ->get()->row();
+            if ($client_custom && !empty($client_custom->client_custom_fieldvalue)) {
+                $sdi_pec = $client_custom->client_custom_fieldvalue;
+                log_message('debug', "SDI PEC trovata: {$sdi_pec}");
+            }
+        }
+        
+        log_message('debug', 'Valori finali - Regime: ' . ($regimefisc ?: 'NULL') . ', Natura IVA0: ' . ($natura_iva0 ?: 'NULL'));
+        
+        // VERIFICA: Se regimefisc è NULL, blocca con errore
+        if (empty($regimefisc)) {
+            $error_msg = "Regime Fiscale mancante. Verifica le impostazioni utente.";
+            log_message('error', $error_msg);
+            log_message('error', 'Verifica: 1) ENV IT_UTENTE_REGIMEFISC_ID 2) Custom field creato 3) Valore compilato');
+            
+            $this->session->set_flashdata('alert_error', $error_msg);
+            redirect('invoices/view/' . $invoice_id);
+            return;
+        }
+        
+        // Determina template XML
+        $xml_lib = 'Fatturapav12';
+        
+        // Opzioni (SENZA default)
+        $options = [
+            'regimefisc' => $regimefisc,
+            'natura_iva0' => $natura_iva0,
+            'sdi_codice' => $sdi_codice,
+            'sdi_pec' => $sdi_pec,
+        ];
+        
+        log_message('debug', 'Options: ' . print_r($options, true));
+        
+        // Nome file
+        $user_vat_clean = str_replace(' ', '', $invoice->user_vat_id);
+        $invoice_num_clean = str_replace(['/', '-', ' '], '', $invoice->invoice_number);
+        $filename = 'IT' . $user_vat_clean . '_' . $invoice_num_clean;
+        
+        log_message('debug', "XML template: {$xml_lib}, filename: {$filename}");
+        
+        // Genera XML
+        try {
+            $xml_file = generate_xml_invoice_file($invoice, $items, $xml_lib, $filename, $options);
+            
+            log_message('debug', "XML generato con successo: {$xml_file}");
+            
+            // Forza download
+            $this->load->helper('download');
+            $xml_content = file_get_contents($xml_file);
+            force_download($filename . '.xml', $xml_content);
+            
+            // Cleanup
+            if (file_exists($xml_file)) {
+                unlink($xml_file);
+            }
+            
+        } catch (Exception $e) {
+            log_message('error', 'Errore generazione FatturaPA: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            
+            $this->session->set_flashdata('alert_error', 'Errore generazione XML: ' . $e->getMessage());
+            redirect('invoices/view/' . $invoice_id);
+        }
+        
+        log_message('debug', '=== GENERATE_XML END ===');
     }
-    //---it---fine
     
     /**
      * @param $invoice_id
