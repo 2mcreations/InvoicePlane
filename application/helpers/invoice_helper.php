@@ -28,18 +28,42 @@ function invoice_logo(): string
 }
 
 /**
- * Returns the invoice logo for PDF files.
+ * Returns the invoice logo (auto-detect context).
  */
 function invoice_logo_pdf(): string
 {
     $CI = &get_instance();
-    if ($CI->mdl_settings->setting('invoice_logo')) {
-        $absolutePath = dirname(dirname(__DIR__));
-        global $pdf_preview;
-
-        return '<img src="' . $absolutePath . '/uploads/' . $CI->mdl_settings->setting('invoice_logo') . '" id="invoice-logo">';
+    
+    if (!$CI->mdl_settings->setting('invoice_logo')) {
+        return '';
     }
-    return '';
+    
+    $logo_filename = $CI->mdl_settings->setting('invoice_logo');
+    
+    // Usa debug_backtrace() per capire il contesto
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+    $is_preview = false;
+    
+    foreach ($backtrace as $trace) {
+        if (isset($trace['function']) && 
+            (strpos($trace['function'], 'preview') !== false || 
+             strpos($trace['function'], 'stream_pdf') !== false)) {
+            $is_preview = true;
+            break;
+        }
+    }
+    
+    if ($is_preview) {
+        return '<img src="' . base_url('uploads/' . $logo_filename) . '" id="invoice-logo">';
+    } else {
+        $logo_path = FCPATH . 'uploads/' . $logo_filename;
+        
+        if (file_exists($logo_path)) {
+            return '<img src="' . $logo_path . '" id="invoice-logo">';
+        } else {
+            return '';
+        }
+    }
 }
 
 /**
