@@ -416,7 +416,10 @@ class Fatturapav12Xml
         // === CONTATTI ===
         $tel = $this->invoice->user_phone ?: ($this->invoice->user_mobile ?: null);
         if ($tel) {
-            $fatturapa->set_node('FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono', $tel);
+            $tel_normalizzato = $this->normalizeTelefono($tel);
+            if (!empty($tel_normalizzato) && strlen($tel_normalizzato) >= 5) {
+                $fatturapa->set_node('FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono', $tel_normalizzato);
+            }
         }
         
         if ($this->invoice->user_email) {
@@ -499,6 +502,33 @@ class Fatturapav12Xml
         }
 
         return $result;
+    }
+
+    /**
+     * Normalizza numero di telefono per FatturaPA (max 12 caratteri)
+     */
+    protected function normalizeTelefono($telefono)
+    {
+        if (empty($telefono)) {
+            return '';
+        }
+        
+        // Rimuovi spazi, trattini, parentesi, punti
+        $tel = preg_replace('/[\s\-\(\)\.\/]/', '', $telefono);
+        
+        // Rimuovi prefisso +39 se presente (già indicato in CountryCode)
+        $tel = preg_replace('/^\+?39/', '', $tel);
+        
+        // Rimuovi altri prefissi internazionali comuni
+        $tel = preg_replace('/^\+/', '', $tel);
+        
+        // Tronca a 12 caratteri se necessario
+        if (strlen($tel) > 12) {
+            $tel = substr($tel, 0, 12);
+            log_message('warning', "Telefono troncato a 12 caratteri: {$telefono} -> {$tel}");
+        }
+        
+        return $tel;
     }
 
 }
