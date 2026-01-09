@@ -252,12 +252,9 @@ class Fatturapav12Xml
             
         } else {
             // Denominazione + P.IVA
-            if (!empty($this->invoice->client_company)) {
-                $destinatario['ragsoc'] = trim($this->invoice->client_company);
-            } elseif (!empty($this->invoice->client_name)) {
-                $destinatario['ragsoc'] = trim($this->invoice->client_name);
-            } else {
-                throw new Exception('Denominazione è obbligatoria per persone giuridiche');
+            $denominazione = $this->invoice->client_company ?? '';
+            if (empty($denominazione)) {
+                throw new Exception('Per persone giuridiche (P.IVA 11 cifre) è obbligatorio compilare il campo "Azienda/Ente" nel cliente.');
             }
             
             if (!empty($this->invoice->client_vat_id)) {
