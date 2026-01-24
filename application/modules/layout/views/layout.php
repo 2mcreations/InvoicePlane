@@ -14,6 +14,21 @@
     // Get the page head content
     $this->layout->load_view('layout/includes/head');
 ?>
+<!-- PWA Manifest -->
+<link rel="manifest" href="<?php echo base_url('manifest.json'); ?>">
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('<?php echo base_url('service-worker.js'); ?>').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+</script>
 </head>
 <body class="<?php echo get_setting('disable_sidebar') ? 'hidden-sidebar' : ''; ?>">
 
