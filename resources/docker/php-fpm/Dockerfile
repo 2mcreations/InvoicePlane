@@ -29,7 +29,18 @@ RUN apt-get update && apt-get install -y \
     locales-all \
     libonig-dev \
     ca-certificates \
+    gnupg \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and Yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g yarn && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Install wkhtmltopdf from GitHub releases (latest stable for Debian 12/Trixie)
 RUN ARCH=$(dpkg --print-architecture) && \
