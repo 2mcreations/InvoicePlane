@@ -41,6 +41,15 @@ class Get extends Base_Controller
         echo json_encode($result);
         exit;
     }
+    
+    /**
+     * Scarica un allegato dalla vista guest
+     * Alias per get_file() per supportare le URL /guest/get/attachment/
+     */
+    public function attachment($filename): void
+    {
+        $this->get_file($filename);
+    }
 
     public function get_file($filename): void
     {
