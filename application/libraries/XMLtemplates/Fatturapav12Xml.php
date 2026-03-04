@@ -166,7 +166,7 @@ class Fatturapav12Xml
         return false;
     }
 
-    public function xml(): void
+    public function xml(): string
     {   
         require_once __DIR__ . '/fatturapa/vendor/autoload.php';
 
@@ -408,28 +408,35 @@ class Fatturapav12Xml
 
         // === NOME FILE CON PROGRESSIVO ===
         $progressivo = $this->getCustomFieldValue('user', $this->IT_UTENTE_PROGR_XML_ID);
+
         if ($progressivo) {
-            // Usa il progressivo CORRENTE per il nome file, poi incrementa
-            $nome_file_xml = $fatturapa->filename($progressivo);
+            $nome_file_xml     = $fatturapa->filename($progressivo);
             $nuovo_progressivo = str_pad((int)$progressivo + 1, 5, '0', STR_PAD_LEFT);
             $this->updateCustomFieldValue('user', $this->IT_UTENTE_PROGR_XML_ID, $nuovo_progressivo);
         } else {
             $nome_file_xml = $fatturapa->filename($this->invoice->invoice_number);
         }
-        $_SERVER['CIIname'] = $nome_file_xml;
+
+        if (!str_ends_with(strtolower($nome_file_xml), '.xml')) {
+            $nome_file_xml .= '.xml';
+        }
 
         // === GENERA E SALVA XML ===
         $xml = $fatturapa->get_xml();
+        $path = UPLOADS_TEMP_FOLDER . $nome_file_xml;
+
         if (IP_DEBUG) {
-            $file = fopen(UPLOADS_TEMP_FOLDER . $nome_file_xml, 'w');
+            $file = fopen($path, 'w');
             fwrite($file, $xml);
             fclose($file);
         } else {
             $doc = new DOMDocument();
             $doc->formatOutput = false;
             $doc->loadXML($xml);
-            $doc->save(UPLOADS_TEMP_FOLDER . $nome_file_xml);
+            $doc->save($path);
         }
+
+        return $nome_file_xml;
     }
 
     /**

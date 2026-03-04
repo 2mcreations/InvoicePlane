@@ -30,9 +30,15 @@ function generate_xml_invoice_file($invoice, $items, string $xml_lib, string $fi
         'filename' => $filename,
         'options'  => $options,
     ], 'ublciixml');
-    $CI->ublciixml->xml();
 
-    return UPLOADS_TEMP_FOLDER . $filename . '.xml';
+    $nome_file = $CI->ublciixml->xml();
+
+    // Fallback per altre librerie XML (ZUGFeRD, UBL, ecc.) che ritornano void
+    if (empty($nome_file)) {
+        $nome_file = $filename . '.xml';
+    }
+
+    return UPLOADS_TEMP_FOLDER . $nome_file;
 }
 
 function include_rdf(string $embedXml, string $urn = 'factur-x'): string
