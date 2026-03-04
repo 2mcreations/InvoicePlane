@@ -203,113 +203,86 @@ class Fatturapav12Xml
             'prov'       => $this->invoice->client_state ?: 'EE',
         ];
 
-        // Codice Fiscale (custom field Cliente)
-        $codice_fiscale = $this->invoice->client_tax_code ?? '';
+        $piva_cliente = trim($this->invoice->client_vat_id ?? '');
+        $cf_cliente   = trim($this->invoice->client_tax_code ?? '');
 
-        // Fallback: usa P.IVA se non c'è CF
-        if (empty($codice_fiscale)) {
-            $codice_fiscale = $this->invoice->client_vat_id ?? '';
+        if (empty($piva_cliente) && empty($cf_cliente)) {
+            throw new Exception('P.IVA o Codice Fiscale del cliente sono obbligatori.');
         }
 
-        if (empty($codice_fiscale)) {
-            throw new Exception('Codice Fiscale (Cliente) è richiesto. Compila il custom field per questo cliente.');
-        }
-
-        $codice_fiscale = strtoupper(trim($codice_fiscale));
-
-        if (!$this->isValidCodiceFiscale($codice_fiscale)) {
-            throw new Exception('Codice Fiscale non valido: "' . $codice_fiscale . '"');
-        }
-
-        $destinatario['codfisc'] = $codice_fiscale;
-
-        // Persona fisica (16 caratteri) o giuridica (11 cifre)
-        $is_persona_fisica = (strlen($codice_fiscale) == 16);
-        $nome = '';
+        // Determina tipo soggetto dalla lunghezza del CF (16 = persona fisica)
+        $is_persona_fisica = (!empty($cf_cliente) && strlen($cf_cliente) === 16);
+        $nome    = '';
         $cognome = '';
 
         if ($is_persona_fisica) {
-            // Nome + Cognome (OBBLIGATORI)
-            $nome = trim($this->invoice->client_name ?? '');
+            // Persona fisica: solo CF, no P.IVA
+            $destinatario['codfisc'] = strtoupper($cf_cliente);
+
+            $nome    = trim($this->invoice->client_name ?? '');
             $cognome = trim($this->invoice->client_surname ?? '');
-            
-            // Se client_surname è vuoto, prova a splittare client_name
+
+            // Prova a splittare client_name se cognome è vuoto
             if (empty($cognome) && !empty($nome)) {
                 $parts = explode(' ', $nome, 2);
-                if (count($parts) == 2) {
-                    $nome = $parts[0];
+                if (count($parts) === 2) {
+                    $nome    = $parts[0];
                     $cognome = $parts[1];
                 } else {
                     throw new Exception('Per persone fisiche servono Nome E Cognome separati. Compila il campo "Cognome" nel cliente.');
                 }
             }
-            
+
             if (empty($nome) || empty($cognome)) {
-                throw new Exception('Nome e Cognome obbligatori per persone fisiche (CF 16 caratteri)');
+                throw new Exception('Nome e Cognome obbligatori per persone fisiche (CF 16 caratteri).');
             }
 
-            $destinatario['codfisc'] = $codice_fiscale;
-            
         } else {
-            $denominazione = $this->invoice->client_company ?? '';
+            // Persona giuridica: P.IVA obbligatoria
+            if (empty($piva_cliente)) {
+                throw new Exception('P.IVA obbligatoria per persone giuridiche (cliente: ' . ($this->invoice->client_company ?? '') . ')');
+            }
+
+            $denominazione = trim($this->invoice->client_company ?? '');
             if (empty($denominazione)) {
                 throw new Exception('Per persone giuridiche è obbligatorio il campo "Azienda/Ente".');
             }
-            $destinatario['ragsoc'] = $denominazione;
 
-            if (!empty($this->invoice->client_vat_id)) {
-                $destinatario['piva'] = trim($this->invoice->client_vat_id);
-                // CF aggiuntivo SOLO se presente E diverso dalla P.IVA
-                if (!empty($this->invoice->client_tax_code) 
-                    && $this->invoice->client_tax_code !== $this->invoice->client_vat_id) {
-                    $destinatario['codfisc'] = trim($this->invoice->client_tax_code);
-                }
-            } elseif (!empty($this->invoice->client_tax_code)) {
-                // Nessuna P.IVA: usa CF come identificativo
-                $destinatario['codfisc'] = trim($this->invoice->client_tax_code);
-            } else {
-                throw new Exception('P.IVA o Codice Fiscale obbligatori per persone giuridiche');
+            $destinatario['ragsoc'] = $denominazione;
+            $destinatario['piva']   = $piva_cliente;
+
+            // CF aggiuntivo solo se presente e diverso dalla P.IVA
+            if (!empty($cf_cliente) && $cf_cliente !== $piva_cliente) {
+                $destinatario['codfisc'] = $cf_cliente;
             }
         }
 
-        // PROVINCIA: deve essere sigla di 2 lettere (obbligatorio per IT)
-        if ($destinatario['paese'] == 'IT') {
+        // PROVINCIA: sigla 2 lettere obbligatoria per IT
+        if ($destinatario['paese'] === 'IT') {
             if (empty($destinatario['prov'])) {
-                throw new Exception('Provincia obbligatoria per indirizzi italiani (cliente: ' . $this->invoice->client_name . ')');
+                throw new Exception('Provincia obbligatoria per indirizzi italiani.');
             }
-            
             $prov = strtoupper(trim($destinatario['prov']));
-            
-            // Verifica che sia esattamente 2 caratteri
-            if (strlen($prov) != 2) {
-                throw new Exception('Provincia deve essere la sigla di 2 lettere (es: PD, MI, RM), trovato: "' . $prov . '". Correggi il campo "Stato/Provincia" del cliente.');
-            }
-            
-            // Verifica che siano solo lettere
             if (!preg_match('/^[A-Z]{2}$/', $prov)) {
-                throw new Exception('Provincia non valida: "' . $prov . '". Usa solo 2 lettere maiuscole (es: PD, MI, RM)');
+                throw new Exception('Provincia non valida: "' . $prov . '". Usa la sigla di 2 lettere (es: TO, MI, RM).');
             }
-            
             $destinatario['prov'] = $prov;
         } else {
-            // Per indirizzi esteri, rimuovi la provincia
             unset($destinatario['prov']);
         }
 
-        // SDI o PEC
+        // SDI o PEC — priorità: Codice SDI → PEC → 0000000
         $sdi_codice = trim((string)$this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_CODICE_ID));
         $sdi_pec    = trim((string)$this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_PEC_ID));
 
-        
         if (!empty($sdi_codice) && preg_match('/^[A-Z0-9]{6,7}$/i', $sdi_codice)) {
             $destinatario['sdi_codice'] = strtoupper(str_pad($sdi_codice, 7, '0', STR_PAD_LEFT));
         } elseif (!empty($sdi_pec) && filter_var($sdi_pec, FILTER_VALIDATE_EMAIL)) {
             $destinatario['sdi_pec'] = $sdi_pec;
         } else {
-            // Privati/consumatori B2C senza SDI né PEC
             $destinatario['sdi_codice'] = '0000000';
         }
-        
+
         log_message('debug', 'Destinatario array: ' . print_r($destinatario, true));
 
         $fatturapa->set_destinatario($destinatario);
