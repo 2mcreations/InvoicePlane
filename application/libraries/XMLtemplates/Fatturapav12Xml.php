@@ -251,19 +251,24 @@ class Fatturapav12Xml
             $destinatario['codfisc'] = $codice_fiscale;
             
         } else {
-            // Denominazione + P.IVA
             $denominazione = $this->invoice->client_company ?? '';
             if (empty($denominazione)) {
-                throw new Exception('Per persone giuridiche (P.IVA 11 cifre) è obbligatorio compilare il campo "Azienda/Ente" nel cliente.');
+                throw new Exception('Per persone giuridiche è obbligatorio il campo "Azienda/Ente".');
             }
             $destinatario['ragsoc'] = $denominazione;
-            
+
             if (!empty($this->invoice->client_vat_id)) {
                 $destinatario['piva'] = trim($this->invoice->client_vat_id);
-            } elseif (strlen($codice_fiscale) == 11) {
-                $destinatario['piva'] = $codice_fiscale;
+                // CF aggiuntivo SOLO se presente E diverso dalla P.IVA
+                if (!empty($this->invoice->client_tax_code) 
+                    && $this->invoice->client_tax_code !== $this->invoice->client_vat_id) {
+                    $destinatario['codfisc'] = trim($this->invoice->client_tax_code);
+                }
+            } elseif (!empty($this->invoice->client_tax_code)) {
+                // Nessuna P.IVA: usa CF come identificativo
+                $destinatario['codfisc'] = trim($this->invoice->client_tax_code);
             } else {
-                throw new Exception('P.IVA è obbligatoria per persone giuridiche');
+                throw new Exception('P.IVA o Codice Fiscale obbligatori per persone giuridiche');
             }
         }
 
@@ -292,16 +297,16 @@ class Fatturapav12Xml
         }
 
         // SDI o PEC
-        $sdi_codice = $this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_CODICE_ID);
-        $sdi_pec = $this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_PEC_ID);
+        $sdi_codice = trim((string)$this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_CODICE_ID));
+        $sdi_pec    = trim((string)$this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_PEC_ID));
 
         
-        if (!empty($sdi_pec)) {
+        if (!empty($sdi_pec) && filter_var($sdi_pec, FILTER_VALIDATE_EMAIL)) {
             $destinatario['sdi_pec'] = $sdi_pec;
-        } elseif (!empty($sdi_codice)) {
-            $destinatario['sdi_codice'] = $sdi_codice;
+        } elseif (!empty($sdi_codice) && strlen($sdi_codice) === 7) {
+            $destinatario['sdi_codice'] = strtoupper($sdi_codice);
         } else {
-            // Default per privati/consumatori finali
+            // solo per privati/consumatori B2C
             $destinatario['sdi_codice'] = '0000000';
         }
         
@@ -372,17 +377,15 @@ class Fatturapav12Xml
         }
 
         // === TOTALI AUTOMATICI ===
-        $opt = ['autobollo' => true];
+        $merge = [];
 
         if ($this->notax) {
-            $opt['natura'] = $natura_iva0;
+            $merge['natura'] = $natura_iva0;
         } else {
-            $opt['esigiva'] = 'I';
+            $merge['esigiva'] = 'I';
         }
 
-        log_message('debug', 'Opzioni set_auto_totali: ' . print_r($opt, true));
-
-        $totale = $fatturapa->set_auto_totali($opt);
+        $totale = $fatturapa->set_auto_totali($merge, ['autobollo' => true]);
 
         log_message('debug', 'Totale calcolato: ' . $totale);
 
