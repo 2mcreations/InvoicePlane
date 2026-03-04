@@ -301,12 +301,12 @@ class Fatturapav12Xml
         $sdi_pec    = trim((string)$this->getCustomFieldValue('client', $this->IT_CLIENTE_SDI_PEC_ID));
 
         
-        if (!empty($sdi_pec) && filter_var($sdi_pec, FILTER_VALIDATE_EMAIL)) {
+        if (!empty($sdi_codice) && preg_match('/^[A-Z0-9]{6,7}$/i', $sdi_codice)) {
+            $destinatario['sdi_codice'] = strtoupper(str_pad($sdi_codice, 7, '0', STR_PAD_LEFT));
+        } elseif (!empty($sdi_pec) && filter_var($sdi_pec, FILTER_VALIDATE_EMAIL)) {
             $destinatario['sdi_pec'] = $sdi_pec;
-        } elseif (!empty($sdi_codice) && strlen($sdi_codice) === 7) {
-            $destinatario['sdi_codice'] = strtoupper($sdi_codice);
         } else {
-            // solo per privati/consumatori B2C
+            // Privati/consumatori B2C senza SDI né PEC
             $destinatario['sdi_codice'] = '0000000';
         }
         
