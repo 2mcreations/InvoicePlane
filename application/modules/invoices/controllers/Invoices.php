@@ -392,6 +392,7 @@ class Invoices extends Admin_Controller
             $invoice->invoice_number
         );
         $invoice_num_clean = str_replace([' '], '', $invoice_num_clean);
+        $user_vat_clean = str_replace(' ', '', $invoice->user_vat_id);
         $filename = 'IT' . $user_vat_clean . '_' . $invoice_num_clean;
 
         log_message('debug', "XML template: {$xml_lib}, filename: {$filename}");
