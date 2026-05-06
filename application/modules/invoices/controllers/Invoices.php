@@ -384,14 +384,21 @@ class Invoices extends Admin_Controller
         log_message('debug', 'Options: ' . print_r($options, true));
 
         // Nome file
-        $invoice_num_clean = preg_replace_callback(
-            '/(\d+)[\/\-](\d{4})/',
-            function($matches) {
-                return $matches[1] . substr($matches[2], 2); // "18/2026" → "1826"
-            },
-            $invoice->invoice_number
-        );
-        $invoice_num_clean = str_replace([' '], '', $invoice_num_clean);
+        preg_match('/^(\d+)[\/\-](\d{4})$/', trim($invoice->invoice_number), $matches);
+
+        if ($matches) {
+            $num  = $matches[1];
+            $year = substr($matches[2], 2);
+            
+            if ((int)$num > 999) {
+                $invoice_num_clean = substr($num, 0, 5);
+            } else {
+                $invoice_num_clean = $num . $year;
+            }
+        } else {
+            $invoice_num_clean = substr(str_replace(['/', '-', ' '], '', $invoice->invoice_number), 0, 5);
+        }
+
         $user_vat_clean = str_replace(' ', '', $invoice->user_vat_id);
         $filename = 'IT' . $user_vat_clean . '_' . $invoice_num_clean;
 
