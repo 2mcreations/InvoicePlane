@@ -369,10 +369,10 @@ class Invoices extends Admin_Controller
             redirect('invoices/view/' . $invoice_id);
             return;
         }
-        
+
         // Determina template XML
         $xml_lib = 'Fatturapav12';
-        
+
         // Opzioni (SENZA default)
         $options = [
             'regimefisc' => $regimefisc,
@@ -380,16 +380,22 @@ class Invoices extends Admin_Controller
             'sdi_codice' => $sdi_codice,
             'sdi_pec' => $sdi_pec,
         ];
-        
+
         log_message('debug', 'Options: ' . print_r($options, true));
-        
+
         // Nome file
-        $user_vat_clean = str_replace(' ', '', $invoice->user_vat_id);
-        $invoice_num_clean = str_replace(['/', '-', ' '], '', $invoice->invoice_number);
+        $invoice_num_clean = preg_replace_callback(
+            '/(\d+)[\/\-](\d{4})/',
+            function($matches) {
+                return $matches[1] . substr($matches[2], 2); // "18/2026" → "1826"
+            },
+            $invoice->invoice_number
+        );
+        $invoice_num_clean = str_replace([' '], '', $invoice_num_clean);
         $filename = 'IT' . $user_vat_clean . '_' . $invoice_num_clean;
-        
+
         log_message('debug', "XML template: {$xml_lib}, filename: {$filename}");
-        
+
         // Genera XML
         try {
             $xml_file = generate_xml_invoice_file($invoice, $items, $xml_lib, $filename, $options);
