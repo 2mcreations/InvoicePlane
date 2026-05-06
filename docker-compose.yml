@@ -4,10 +4,10 @@
 networks:
   invoiceplane:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.25.0.0/17
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.25.0.0/17
 
 volumes:
   invoiceplane-db:
@@ -33,14 +33,14 @@ services:
       "
     links:
       - db
-    expose:
-      - "9000"
-    dns: 8.8.8.8
+ #   expose:
+ #     - "9000"
+ #   dns: 8.8.8.8
     depends_on:
       - db
     networks:
-      invoiceplane:
-        ipv4_address: 172.25.0.11
+      - invoiceplane
+ #       ipv4_address: 172.25.0.11
     volumes:
       - .:/var/www/projects/invoiceplane:delegated
       - ./resources/docker/php-fpm/php-dev.ini:/usr/local/etc/php/php.ini
@@ -54,13 +54,13 @@ services:
     links:
       - php
     ports:
-      - "80:80"
-    dns: 8.8.8.8
+      - "8888:80"
+  #  dns: 8.8.8.8
     depends_on:
       - php
     networks:
-      invoiceplane:
-        ipv4_address: 172.25.0.12
+      - invoiceplane
+  #      ipv4_address: 172.25.0.12
     volumes:
       - .:/var/www/projects/invoiceplane:delegated
       - nginx_logs:/var/log/nginx
@@ -73,46 +73,60 @@ services:
     build:
       context: ./resources/docker/mariadb
     environment:
-      - MARIADB_ROOT_PASSWORD=ipdevdb
-      - MARIADB_USER=ipdevdb
-      - MARIADB_PASSWORD=ipdevdb
-      - MARIADB_DATABASE=invoiceplane_db
-    ports:
-      - "3306:3306"
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+  #  ports:
+  #    - "3306:3306"
     networks:
-      invoiceplane:
-        ipv4_address: 172.25.0.13
+      - invoiceplane
+  #      ipv4_address: 172.25.0.13
     volumes:
       - "invoiceplane-db:/var/lib/mysql"
       - ./resources/docker/mariadb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
 
-  phpmyadmin:
-    container_name: "invoiceplane-dbadmin"
-    build:
-      context: ./resources/docker/phpmyadmin
-    environment:
-      - PMA_HOST=invoiceplane-db
-      #- PMA_USER=root
-      #- PMA_PASSWORD=ipdevdb
-      #- PMA_ROOT_PASSWORD=ipdevdb
-      - MYSQL_DATABASE=invoiceplane_db
-      - MYSQL_USER=ipdevdb
-      - MYSQL_PASSWORD=ipdevdb
-      - MYSQL_ROOT_PASSWORD=ipdevdb
-      - MAX_EXECUTION_TIME=600
-      - MEMORY_LIMIT=256M
-      - UPLOAD_LIMIT=2G
-    depends_on:
-      - db
-    links:
-      - db
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-invoice
     restart: unless-stopped
-    volumes:
-      - ./resources/docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
-      - ./resources/docker/databases:/var/www/html/tmp/upload_databases
-    ports:
-      - "8081:80"
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - nginx
+    labels:
+      - "com.centurylinklabs.watchtower.scope=invoceplane"
     networks:
-      invoiceplane:
-        ipv4_address: 172.25.0.16
+      - invoiceplane
+
+#  phpmyadmin:
+#    container_name: "invoiceplane-dbadmin"
+#    build:
+#      context: ./resources/docker/phpmyadmin
+#    environment:
+#      - PMA_HOST=invoiceplane-db
+#      #- PMA_USER=root
+#      #- PMA_PASSWORD=ipdevdb
+#      #- PMA_ROOT_PASSWORD=ipdevdb
+#      - MYSQL_DATABASE=invoiceplane_db
+#      - MYSQL_USER=ipdevdb
+#      - MYSQL_PASSWORD=ipdevdb
+#      - MYSQL_ROOT_PASSWORD=ipdevdb
+#      - MAX_EXECUTION_TIME=600
+#      - MEMORY_LIMIT=256M
+#      - UPLOAD_LIMIT=2G
+#    depends_on:
+#      - db
+#    links:
+#      - db
+#    restart: unless-stopped
+#    volumes:
+#      - ./resources/docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+#      - ./resources/docker/databases:/var/www/html/tmp/upload_databases
+#    ports:
+#      - "8081:80"
+#    networks:
+#      invoiceplane:
+#        ipv4_address: 172.25.0.16
